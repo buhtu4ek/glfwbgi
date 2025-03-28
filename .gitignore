@@ -1,7 +1,15 @@
+# Visual studio files
+.vs/
+*.vcxproj.user
+
 # Prerequisites
 *.d
 
 # Compiled Object files
+x64/
+build/
+tmp/
+Win32/
 *.slo
 *.lo
 *.o
@@ -15,10 +23,6 @@
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
