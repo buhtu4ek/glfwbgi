@@ -10,7 +10,7 @@ using namespace Graph;
 
 int main()
 {
-	// Створення графічного вікна розміром 640 х 480 пікселей
+	// Створення графічного вікна розміром 800 х 600 пікселей
 	if (!Graph::InitGraph(800, 600, "Some Title: Press Q to quit"))
 	{
 		printf("Graphics could not be initialized");
@@ -99,7 +99,7 @@ int main()
 		DrawImage(image1, 240, 120);
 	}
 
-	// Прозорий спрайт
+	// Прозорий нахилений спрайт
 	Graph::Image image2;
 	if (LoadBMPImageTransparent(image2, "mario.bmp"))
 	{
