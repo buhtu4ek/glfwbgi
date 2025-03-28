@@ -3,8 +3,9 @@
 #include "glfwbgi.h"
 
 #ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
 //#error apple defined
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 #else
 #include "glfw\glfw3.h"
 #include <gl\GL.h>
@@ -1164,7 +1165,7 @@ bool Image::LoadBMP(const char * filename, bool transparent)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	// Unbind the texture
-	glBindTexture(GL_TEXTURE_2D, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Output a successful message
 	DBG_PRINT("Texture from [%s] (%u x %u) successfully loaded (tex %u).\n", filename, width, height, texture);

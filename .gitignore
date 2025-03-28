@@ -10,6 +10,7 @@ x64/
 build/
 tmp/
 Win32/
+glfwtest
 *.slo
 *.lo
 *.o
