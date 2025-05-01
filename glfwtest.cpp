@@ -5,44 +5,71 @@
 
 #include "glfwbgi.h"
 
+#include "include/GLFW/glfw3.h"
+
 using namespace Graph;
+
+void CursorPosHandler(int xpos, int ypos)
+{
+	printf("Cursor is at (%d,%d)\n", xpos, ypos);
+}
+
+void CursorEnterHandler(bool entered)
+{
+	printf("Cursor %s the window\n", entered ? "entered" : "left");
+}
+
+void MouseButtonHandler(Mouse::Button button, Mouse::Action act)
+{
+	static const char* ButtonNames[] = { "Left", "Right", "Middle", "Additional1", "Additional2", "Additional3", "Additional4", "Additional5" };
+
+	printf("%s mouse button %s\n",
+		ButtonNames[(int)button],
+		act == Mouse::Action::Pressed ? "pressed" : "released"
+	);
+}
+
+void ScrollHandler (int xoffset, int yoffset)
+{
+	printf("Mouse scrolled by (%d, %d)\n", xoffset, yoffset);
+}
 
 int main()
 {
-	// РЎС‚РІРѕСЂРµРЅРЅСЏ РіСЂР°С„С–С‡РЅРѕРіРѕ РІС–РєРЅР° СЂРѕР·РјС–СЂРѕРј 800 С… 600 РїС–РєСЃРµР»РµР№
+	// Створення графічного вікна розміром 800 х 600 пікселей
 	if (!Graph::InitGraph(800, 600, "Some Title: Press Q to quit"))
 	{
 		printf("Graphics could not be initialized");
 		return 0;
 	}
 
-	// РћС‡РёСЃС‚РєР° РІС–РєРЅР° С– Р·Р°Р»РёРІРєР° Р·Р°РґР°РЅРёРј РєРѕР»СЊРѕСЂРѕРј
+	// Очистка вікна і заливка заданим кольором
 	ClearDevice(Color::Aquamarine);
 
-	// Р—Р°РїРѕРІРЅРµРЅРёР№ (СЃСѓС†С–Р»СЊРЅРѕ) РїСЂСЏРјРѕРєСѓС‚РЅРёРє РѕСЂР°РЅР¶РµРІРѕРіРѕ РєРѕР»СЊРѕСЂСѓ
+	// Заповнений (суцільно) прямокутник оранжевого кольору
 	FillRectangle(10, 20, 100, 350, Color::Orange);
 
-	// РџСЂСЏРјРѕРєСѓС‚РЅРёРє (РєРѕРЅС‚СѓСЂ) С‡РµСЂРІРѕРЅРѕРіРѕ РєРѕР»СЊРѕСЂСѓ
+	// Прямокутник (контур) червоного кольору
 	DrawRectangle(10, 20, 100, 350, Color::Red);
 
 	DrawRectangle(300, 300, 350, 350, Color::Olive);
 
 	FillRectangle(400, 400, 450, 450, Color::Black);
 
-	// РўРѕРІС‰РёРЅР° Р»С–РЅРёР№ РІ РїС–РєСЃРµР»СЏС… (РІРїР»РёРІР°С” Р»РёС€Рµ РЅР° РЅР°СЃС‚СѓРїРЅС– РєРѕРјР°РЅРґРё)
+	// Товщина ліний в пікселях (впливає лише на наступні команди)
 	SetLineWidth(1.7f);
 
-	// Р•Р»С–РїСЃРё (РєРѕРЅС‚СѓСЂРё) Р·РµР»РµРЅРѕРіРѕ РєРѕР»СЊРѕСЂСѓ
+	// Еліпси (контури) зеленого кольору
 	DrawEllipseArc(200, 120, 15, 10, 10, 250, Color::Green);
 	DrawEllipseSector(200, 220, 15, 10, 10, 250, Color::Green);	
 	DrawEllipseChord(200, 320, 15, 10, 10, 250, Color::Green);
 
-	// Р•Р»С–РїСЃРё (Р·Р°Р»РёС‚С–)
+	// Еліпси (залиті)
 	FillEllipseChord(400, 120, 15, 10, 0, 360, Color::Lavender);
 	FillEllipseSector(400, 220, 15, 10, 10, 250, Color::Lavender);
 	FillEllipseChord(400, 320, 15, 10, 10, 250, Color::Lavender);
 
-	// РџС–РґРіРѕС‚РѕРІРєР° РјР°СЃРёРІСѓ С‚РѕС‡РѕРє Рї'СЏС‚РёРєСѓС‚РЅРёРєР°
+	// Підготовка масиву точок п'ятикутника
 	Point polyPoints[5];
 	polyPoints[0].x = 500;
 	polyPoints[0].y = 100;
@@ -55,9 +82,9 @@ int main()
 	polyPoints[4].x = 500;
 	polyPoints[4].y = 130;
 
-	// Рџ'СЏС‚РёРєСѓС‚РЅРёРє Р·Р°Р»РёС‚РёР№ С‡РѕСЂРЅРёРј
+	// П'ятикутник залитий чорним
 	FillPoly(polyPoints, 5, Color::Black);
-	// РљРѕРЅС‚СѓСЂ Рї'СЏС‚РёРєСѓС‚РЅРёРєР° Р¶РѕРІС‚РѕРіРѕ РєРѕР»СЊРѕСЂСѓ
+	// Контур п'ятикутника жовтого кольору
 	DrawPoly(polyPoints, 5, Color::Yellow);
 	
 	polyPoints[0].x = 500;
@@ -70,19 +97,19 @@ int main()
 	polyPoints[3].y = 120 + 100;
 	polyPoints[4].x = 500;
 	polyPoints[4].y = 130 + 100;
-	// Р›Р°РјР°РЅР° Р»С–РЅС–СЏ Р· 4 РІС–РґСЂС–Р·РєС–РІ (5 С‚РѕС‡РѕРє)
+	// Ламана лінія з 4 відрізків (5 точок)
 	DrawPolyLine(polyPoints, 5, Color::Asparagus);
 
-	// Р›С–РЅС–СЏ С‡РµСЂРІРѕРЅРѕРіРѕ РєРѕР»СЊРѕСЂСѓ				   R   G  B
+	// Лінія червоного кольору				   R   G  B
 	DrawLine(550, 400, 570, 400, GetColor(255, 0, 0));
 
-	// Р›С–РЅС–СЏ СЃРёРЅСЊРѕРіРѕ РєРѕР»СЊРѕСЂСѓ
+	// Лінія синього кольору
 	DrawLine(580, 400, 580, 440, Color::Blue);
 
-	// Р›С–РЅС–СЏ Р·РµР»РµРЅРѕРіРѕ РєРѕР»СЊРѕСЂСѓ
+	// Лінія зеленого кольору
 	DrawLine(580, 450, 540, 460, Color::Green);
 
-	// РўРµРєСЃС‚
+	// Текст
 	OutText(10, 400, "the quick brown fox jumps over the lazy dog 1234567890", Color::White);
 	OutText(10, 500, "the quick brown fox jumps over the lazy dog 1234567890", Color::Red, 10);
 
@@ -91,14 +118,14 @@ int main()
 
 	OutText(10, 600, 'S', Color::Blue, 12);
 
-	// РЎРїСЂР°Р№С‚
+	// Спрайт
 	Graph::Image image1;
 	if (LoadBMPImage(image1, "mario.bmp"))
 	{
 		DrawImage(image1, 240, 120);
 	}
 
-	// РџСЂРѕР·РѕСЂРёР№ РЅР°С…РёР»РµРЅРёР№ СЃРїСЂР°Р№С‚
+	// Псевдо-прозорий нахилений спрайт
 	Graph::Image image2;
 	if (LoadBMPImageTransparent(image2, "mario.bmp"))
 	{
@@ -107,22 +134,36 @@ int main()
 		DrawImageTilted(image2, 640,220, 40, 60, 70);
 	}
 
-	// "Р·РјС–РЅР° Р±СѓС„РµСЂС–РІ"
-	// РўС–Р»СЊРєРё РїС–СЃР»СЏ С†С–С”С— РєРѕРјР°РЅРґРё РІСЃРµ РЅР°РјР°Р»СЊРѕРІР°РЅРµ Р·'СЏРІРёС‚СЊСЃСЏ РЅР° РµРєСЂР°РЅС–
+	// Прозорий нахилений спрайт
+	Graph::Image image3;
+	if (image3.LoadPNG("mario.png"))
+	{
+		DrawImageTilted(image3, 750, 120, 40, 60, -30);
+
+		DrawImageTilted(image3, 750, 220, 40, 60, -70);
+	}
+
+	// "зміна буферів"
+	// Тільки після цієї команди все намальоване з'явиться на екрані
 	SwapBuffers();
 
-	// Р¦РёРєР» РѕС‡С–РєСѓРІР°РЅРЅСЏ РЅР°С‚РёСЃРєР°РЅРЅСЏ РєР»Р°РІС–С€С– "Q"
+	Mouse::SetButtonCallback(MouseButtonHandler);
+	Mouse::SetScrollButtonCallback(ScrollHandler);
+	Mouse::SetCursorPosCallback(CursorPosHandler);
+	Mouse::SetCursorEnterCallback(CursorEnterHandler);
+
+	// Цикл очікування натискання клавіші "Q"
 	while (! Graph::IsKeyPressed( Graph::VK_Q))
 	{
-		// Р—Р°С‚СЂРёРјРєР° 10 РјСЃ (РѕР±РѕРІ'СЏР·РєРѕРІРѕ РІРёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚Рё СЃР°РјРµ С—С—, Р° РЅРµ СЃРёСЃС‚РµРјРЅС– С„СѓРЅРєС†С–С—)
+		// Затримка 10 мс (обов'язково використовувати саме її, а не системні функції)
 		Graph::Delay(10);
 
-		// Р¦СЏ СѓРјРѕРІР° Р·РїСЂР°С†СЋС” СЏРєС‰Рѕ Р±СѓР»Рѕ РЅР°С‚РёСЃРЅРµРЅРѕ С…СЂРµСЃС‚РёРє РЅР° РІС–РєРЅС–
+		// Ця умова зпрацює якщо було натиснено хрестик на вікні
 		if (Graph::ShouldClose())
 			break;
 	}
 
-	// РљРѕСЂРµРєС‚РЅРµ Р·Р°РєСЂРёС‚С‚СЏ РіСЂР°С„С–С‡РЅРѕРіРѕ РІС–РєРЅР°
+	// Коректне закриття графічного вікна
 	Graph::CloseGraph();
 	
 	return 0;

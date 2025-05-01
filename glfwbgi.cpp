@@ -11,11 +11,14 @@
 #include <gl\GL.h>
 #endif
 
+#include "lodepng.h"
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 #include <fstream>
 #include <cstdint>
+#include <set>
 
 //#define DBG_OUT
 #ifdef DBG_OUT
@@ -50,13 +53,19 @@ GLFWwindow * g_GraphWindow = nullptr;
 int g_ScreenW = 0;
 int g_ScreenH = 0;
 
+static Mouse::ButtonFunc      g_MouseButtonHandler = nullptr;
+static Mouse::CursorEnterFunc g_MouseEnterHandler = nullptr;
+static Mouse::CursorPosFunc   g_MousePosHandler = nullptr;
+static Mouse::ScrollFunc      g_MouseScrollHandler = nullptr;
+
+static std::set<Mouse::IInputCallback* > g_MouseHandlers;
+
 // Key buffer
 const unsigned long KeyBufSize = 32;
 unsigned int keyBuf[KeyBufSize];
 unsigned long bufCurSize = 0;
 unsigned long bufRIndex = 0;
 unsigned long bufWIndex = 0;
-
 
 // VKey buffer
 bool g_pressedKeys[GLFW_KEY_LAST];
@@ -104,6 +113,95 @@ void MyCharCallback(GLFWwindow* pWindow, unsigned int charCode)
 void MyResizeCallback(GLFWwindow* pWindow, int, int)
 {
 	glfwSetWindowSize(pWindow, g_ScreenW, g_ScreenH);
+}
+
+//
+// Mouse callbacks
+//
+void MyMousePosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (window != g_GraphWindow)
+		return;
+
+	if (g_MousePosHandler)
+		g_MousePosHandler((int)xpos, (int)ypos);
+
+	for (auto it : g_MouseHandlers)
+	{
+		it->OnMove((int)xpos, (int)ypos);
+	}
+}
+
+void MyMouseEnterCallback(GLFWwindow* window, int entered)
+{
+	if (window != g_GraphWindow)
+		return;
+
+	const bool enter = entered != GLFW_FALSE;
+
+	if (g_MouseEnterHandler)
+		g_MouseEnterHandler(enter);
+
+	for (auto it : g_MouseHandlers)
+	{
+		if (enter)
+			it->OnEnter();
+		else
+			it->OnLeave();
+	}
+}
+
+void MyMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (window != g_GraphWindow)
+		return;
+
+	Mouse::Button but;
+
+	if (button < 0 || button > 7)
+	{
+		but = Mouse::Button::Unknown;
+	}
+	else
+	{
+		but = (Mouse::Button)button;
+	}
+
+	Mouse::Action act = (Mouse::Action)action;
+
+	if (g_MouseButtonHandler)
+		g_MouseButtonHandler(but, act);
+
+	for (auto it : g_MouseHandlers)
+	{
+		if (act == Mouse::Pressed)
+			it->OnButtonDown(but);
+		else
+			it->OnButtonUp(but);
+	}
+}
+
+void MyMouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if (window != g_GraphWindow)
+		return;
+
+	const int yoff = (int)yoffset;
+
+	if (g_MouseScrollHandler)
+		g_MouseScrollHandler((int)xoffset, yoff);
+
+	if (yoff != 0)
+	{
+		for (auto it : g_MouseHandlers)
+		{
+			if (yoff > 0)
+				it->OnScrollUp();
+			else
+				it->OnScrollDown();
+		}
+	}
+
 }
 
 unsigned long GetColor(unsigned char r, unsigned char g, unsigned char b)
@@ -157,16 +255,21 @@ bool InitGraph(int width, int height, const char * title)
 	}
 #endif // DBG_OUT
 
-	//glViewport(0, 0, width, height);
-
-
 	//Make the window's context current */
 	glfwMakeContextCurrent(graphWindow);
 
 	glfwSetKeyCallback(graphWindow, &MyKeyCallback);
 	glfwSetCharCallback(graphWindow, &MyCharCallback);
+	DBG_PRINT("key callbacks set\n");
+
+	glfwSetCursorPosCallback(graphWindow, MyMousePosCallback);
+	glfwSetCursorEnterCallback(graphWindow, MyMouseEnterCallback);
+	glfwSetMouseButtonCallback(graphWindow, MyMouseButtonCallback);
+	glfwSetScrollCallback(graphWindow, MyMouseScrollCallback);
+	DBG_PRINT("mouse callbacks set\n");
+
 	glfwSetWindowSizeCallback(graphWindow, &MyResizeCallback);
-	DBG_PRINT("callbacks set\n");
+	DBG_PRINT("all callbacks set\n");
 
 	glMatrixMode(GL_PROJECTION);
 
@@ -1180,6 +1283,57 @@ bool Image::LoadBMP(const char * filename, bool transparent)
 	return true;
 }
 
+bool Image::LoadPNG(const char* filename)
+{
+	std::vector<unsigned char> fileBuf;
+	{
+		int err = lodepng::load_file(fileBuf, filename);
+		if (err)
+		{
+			printf("Error [%d, %d] reading file [%s]", err, errno, filename);
+			return false;
+		}
+	}
+
+	std::vector<unsigned char> pngPixels;
+	unsigned int width = 0;
+	unsigned int height = 0;
+	unsigned res = lodepng::decode(pngPixels, width, height, fileBuf.data(), fileBuf.size());
+
+	if (res)
+	{
+		printf("Error [%d] decoding file [%s]", res, filename);
+		return false;
+	}
+
+	DBG_PRINT("PNG file %s loaded (%u x %u).\n", filename, width, height);
+
+	/*******************GENERATING TEXTURES*******************/
+	GLuint texture;
+
+	glGenTextures(1, &texture);             // Generate a texture
+	glBindTexture(GL_TEXTURE_2D, texture); // Bind that texture temporarily
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	// Create the texture. We get the offsets from the image, then we use it with the image's
+	// pixel data to create it.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pngPixels.data());
+
+	// Unbind the texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	DBG_PRINT("Texture from [%s] (%u x %u) successfully loaded (tex %u).\n", filename, width, height, texture);
+
+	m_Texture = texture;
+	m_Initialized = true;
+	m_Width = width;
+	m_Height = height;
+
+	return true;
+}
+
 void Image::Draw(double x, double y) const
 {
 	DrawTilted(x+m_Width/2, y+m_Height/2, m_Width, m_Height, 0);
@@ -1243,9 +1397,69 @@ bool LoadBMPImage(Image& image, const char* filename)
 	return image.LoadBMP(filename, false);
 }
 
+bool LoadPNGImage(Image& image, const char* filename)
+{
+	return image.LoadPNG(filename);
+}
+
 bool LoadBMPImageTransparent(Image& image, const char* filename)
 {
 	return image.LoadBMP(filename, true);
 }
 
+void SetCursorMode(Mouse::CursorMode mode)
+{
+	unsigned int glfw_mode = GLFW_CURSOR_NORMAL;
+
+	switch (mode)
+	{
+		case Mouse::CursorMode::Hidden:
+			glfw_mode = GLFW_CURSOR_HIDDEN;
+			break;
+		case Mouse::CursorMode::Disabled:
+			glfw_mode = GLFW_CURSOR_DISABLED;
+			break;
+		case Mouse::CursorMode::Captured:
+			glfw_mode = GLFW_CURSOR_CAPTURED;
+			break;
+		case Mouse::CursorMode::Normal:
+		default:
+			glfw_mode = GLFW_CURSOR_NORMAL;
+	}
+
+	//glfwSetInputMode(g_GraphWindow, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	glfwSetInputMode(g_GraphWindow, GLFW_CURSOR, glfw_mode);
+}
+
+void Mouse::SetCursorPosCallback(CursorPosFunc cb)
+{
+	g_MousePosHandler = cb;
+}
+
+void Mouse::SetCursorEnterCallback(CursorEnterFunc cb)
+{
+	g_MouseEnterHandler = cb;
+}
+
+void Mouse::SetButtonCallback(ButtonFunc cb)
+{
+	g_MouseButtonHandler = cb;
+}
+
+void Mouse::SetScrollButtonCallback(ScrollFunc cb)
+{
+	g_MouseScrollHandler = cb;
+}
+
+void Mouse::AddInputHandler(IInputCallback* pIcb)
+{
+	g_MouseHandlers.insert(pIcb);
+}
+
+void Mouse::RemoveInputHandler(IInputCallback* pIcb)
+{
+	g_MouseHandlers.erase(pIcb);
+}
+
 } // namespace Graph
+

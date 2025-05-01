@@ -1,5 +1,6 @@
 # Visual studio files
 .vs/
+.vscode/
 *.vcxproj.user
 
 # Prerequisites
@@ -35,3 +36,6 @@ glfwtest
 *.exe
 *.out
 *.app
+
+# Backups
+*.bak

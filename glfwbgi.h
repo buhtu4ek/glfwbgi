@@ -4,11 +4,12 @@
 
 namespace Graph
 {
-// РџРѕРІРµСЂС‚Р°С” РєРѕР»С–СЂ, Р·С–Р±СЂР°РЅРёР№ Р· С‚СЂСЊРѕС… РєРѕРјРїРѕРЅРµРЅС‚ RGB.
-// РљРѕР¶РЅР° РєРѕРјРїРѕРЅРµРЅС‚Р° РјРѕР¶Рµ Р±СѓС‚Рё Сѓ РґС–Р°РїР°Р·РѕРЅС– [0..255]
+
+// Повертає колір, зібраний з трьох компонент RGB.
+// Кожна компонента може бути у діапазоні [0..255]
 unsigned long GetColor(unsigned char r, unsigned char g, unsigned char b);
 
-// СЃС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ РѕРїРёСЃСѓ С‚РѕС‡РѕРє РґР»СЏ РјР°Р»СЋРІР°РЅРЅСЏ Р±Р°РіР°С‚РѕРєСѓС‚РЅРёРєС–РІ
+// структура для опису точок для малювання багатокутників
 typedef struct  
 {
 	int x;
@@ -18,110 +19,116 @@ typedef struct
 class Image;
 
 //
-// Р¤СѓРЅРєС†С–С— РґР»СЏ СЂРѕР±РѕС‚Рё Р· РіСЂР°С„С–С‡РЅРёРј РІС–РєРЅРѕРј
+// Функції для роботи з графічним вікном
 //
 
-// РЎС‚РІРѕСЂСЋС” РіСЂР°С„С–С‡РЅРµ РІС–РєРЅРѕ СЂРѕР·РјС–СЂРѕРј width С… height, Р·Р°РіРѕР»РѕРІРѕРє РІС–РєРЅР° - title
-// РїРѕРІРµСЂС‚Р°С” true СЏРєС‰Рѕ РІСЃРµ РґРѕР±СЂРµ
-// СЏРєС‰Рѕ РЅРµ РІРёР№С€Р»Рѕ - РїРѕРІРµСЂС‚Р°С” false
+// Створює графічне вікно розміром width х height, заголовок вікна - title
+// повертає true якщо все добре
+// якщо не вийшло - повертає false
 bool InitGraph(int width, int height, const char * title);
 
-// РџРѕРІРµСЂС‚Р°С”, С‡Рё Р±СѓР»Р° РЅР°С‚РёСЃРЅРµРЅР° РєРЅРѕРїРєР° Р·Р°РєСЂРёС‚С‚СЏ РІС–РєРЅР° (С…СЂРµСЃС‚РёРє)
+// Повертає, чи була натиснена кнопка закриття вікна (хрестик)
 bool ShouldClose();
 
-// РљРѕСЂРµРєС‚РЅРѕ Р·Р°РєСЂРёРІР°С” РіСЂР°С„С–С‡РЅРµ РІС–РєРЅРѕ
+// Коректно закриває графічне вікно
 void CloseGraph();
 
 //
-// РџСЂРѕС†РµРґСѓСЂС‹ РґР»СЏ СЂРѕР±РѕС‚Рё Р· РіСЂР°С„С–С‡РЅРёРјРё Р±СѓС„РµСЂР°РјРё
+// Процедуры для роботи з графічними буферами
 //
 
-// РћС‡РёС‰СѓС” Р±СѓС„РµСЂ РјР°Р»СЋРІР°РЅРЅСЏ С‚Р° Р·Р°Р»РёРІР°С” Р№РѕРіРѕ Р·Р°РґР°РЅРёРјРј РєРѕР»СЊРѕСЂРѕРј
+// Очищує буфер малювання та заливає його заданимм кольором
 void ClearDevice(unsigned long color);
 
-// РњС–РЅСЏС” РјС–СЃС†СЏРјРё Р±СѓС„РµСЂ РјР°Р»СЋРІР°РЅРЅСЏ С‚Р° Р±СѓС„РµСЂ РµРєСЂР°РЅСѓ (РІРёРІРѕРґРёС‚СЊ РЅР°РјР°Р»СЊРѕРІР°РЅРµ РЅР° РµРєСЂР°РЅ)
+// Міняє місцями буфер малювання та буфер екрану (виводить намальоване на екран)
 void SwapBuffers();
 
 //
-// РџСЂРѕС†РµРґСѓСЂРё РґР»СЏ СЂРѕР±РѕС‚Рё Р· РєР»Р°РІС–Р°С‚СѓСЂРѕСЋ
+// Процедури для роботи з клавіатурою
 //
 
-// РџРѕРІРµСЂС‚Р°С”, С‡Рё РЅР°С‚РёСЃРЅРµРЅР° РєР»Р°РІС–С€Р° С–Р· Р·Р°РґР°РЅРёРј РєРѕРґРѕРј (РєРѕРґРё РЅРёР¶С‡Рµ) 
+// Повертає, чи натиснена клавіша із заданим кодом (коди нижче) 
 bool IsKeyPressed(unsigned short vkey);
 
-// РџРѕРІРµСЂС‚Р°С”, С‡Рё РЅР°С‚РёСЃРЅРµРЅР° Р±СѓРґСЊ-СЏРєР° РєР»Р°РІС–С€Р°
+// Повертає, чи натиснена будь-яка клавіша
 bool KeyPressed();
 
-// Р§РµРєР°С” РЅР°С‚РёСЃРЅРµРЅРЅСЏ РєР»Р°РІС–С€С– С– РїРѕРІРµСЂС‚Р°С” РЅР°С‚РёСЃРЅРµРЅРёР№ СЃРёРјРІРѕР»
-// (РЅРµ СЂРµР°РіСѓС” РЅР° СЃРїРµС†. РєР»Р°РІС–С€С– С‚РёРїРё "Ctrl" "Shift")
+// Чекає натиснення клавіші і повертає натиснений символ
+// (не реагує на спец. клавіші типи "Ctrl" "Shift")
 char ReadKey();
 
-// РџСЂРёР·СѓРїРёРЅСЏС” РІРёРєРѕРЅР°РЅРЅСЏ РїСЂРѕРіСЂР°РјРё РЅР° Р·Р°РґР°РЅСѓ РєС–Р»СЊРєС–СЃС‚СЊ РјС–Р»С–СЃРµРєСѓРЅРґ
+// Призупиняє виконання програми на задану кількість мілісекунд
 void Delay(long ms);
 
 //
-// РџСЂРѕС†РµРґСѓСЂС‹ РјР°Р»СЋРІР°РЅРЅСЏ
-// (РІСЃРµ РјР°Р»СЋРІР°РЅРЅСЏ РІС–РґР±СѓРІР°С”С‚СЊСЃСЏ РЅР° Р±СѓС„РµСЂС– РјР°Р»СЋРІР°РЅРЅСЏ С– РѕРґСЂР°Р·Сѓ РЅР° РµРєСЂР°РЅ РЅРµ РІРёРІРѕРґРёС‚СЊСЃСЏ)
+// Процедуры малювання
+// (все малювання відбувається на буфері малювання і одразу на екран не виводиться)
 //
 
-// Р’СЃС‚Р°РЅРѕРІР»СЋС” С‚РѕРІС‰РёРЅСѓ Р»С–РЅС–С— (Сѓ РїС–РєСЃРµР»СЏС…)
-// РґР»СЏ РІСЃС–С… РЅР°СЃС‚СѓРїРЅРёС… РїСЂРѕС†РµРґСѓСЂ РјР°Р»СЋРІР°РЅРЅСЏ Р»С–РЅС–Р№
+// Встановлює товщину лінії (у пікселях)
+// для всіх наступних процедур малювання ліній
 void SetLineWidth(float thickness);
 
-// РњР°Р»СЋС” Р»С–РЅС–СЋ Р· РєРѕРѕСЂРґРёРЅР°С‚ (x1,y1) Сѓ РєРѕРѕСЂРґРёРЅР°С‚Рё (x2,y2) РєРѕР»СЊРѕСЂРѕРј color
+// Малює лінію з координат (x1,y1) у координати (x2,y2) кольором color
 void DrawLine(short x1, short y1, short x2, short y2, unsigned long color);
 
-// РњР°Р»СЋС” РєРѕРЅС‚СѓСЂ Р±РіР°С‚РѕРєСѓС‚РЅРёРєР° РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё РІРµСЂС€РёРЅ Р»РµР¶Р°С‚СЊ РІ РјР°СЃСЃРёРІС– points, РєС–Р»СЊРєС–СЃС‚СЊ - count
+// Малює контур бгатокутника кольором color
+// Координати вершин лежать в массиві points, кількість - count
 void DrawPoly(Point * points, unsigned short count, unsigned long color);
 
-// РњР°Р»СЋС” Р»Р°РјР°РЅСѓ Р»С–РЅС–СЋ РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё С‚РѕС‡РѕРє Р»РµР¶Р°С‚СЊ РІ РјР°СЃСЃРёРІС– points, РєС–Р»СЊРєС–СЃС‚СЊ - count
+// Малює ламану лінію кольором color
+// Координати точок лежать в массиві points, кількість - count
 void DrawPolyLine(Point * points, unsigned short count, unsigned long color);
 
-// РњР°Р»СЋС” РґСѓРіСѓ СЌР»С–РїСЃСѓ РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё С†РµРЅС‚СЂСѓ - (x,y) РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - xradius, РІРµСЂС‚РёРєР°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - yradius
-// РїРѕС‡Р°С‚РєРѕРІРёР№ РєСѓС‚ РґСѓРіРё - startAngle, РєС–РЅС†РµРІРёР№ РєСѓС‚ - stopAngle
-// (РєСѓС‚Рё РІ РіСЂР°РґСѓСЃР°С…, СЂР°С…СѓСЋС‚СЊСЃСЏ РїСЂРѕС‚Рё РіРѕРґРёРЅРЅРёРєРѕРІРѕС— СЃС‚СЂС–Р»РєРё, 0 РіСЂР°РґСѓСЃС–РІ - С†Рµ СЂС–РІРЅРѕ РїСЂР°РІРѕСЂСѓС‡)
+// Малює дугу эліпсу кольором color
+// Координати центру - (x,y) горизонтальний радіус - xradius, вертикальний радіус - yradius
+// початковий кут дуги - startAngle, кінцевий кут - stopAngle
+// (кути в градусах, рахуються проти годинникової стрілки, 0 градусів - це рівно праворуч)
 void DrawEllipseArc(short x, short y, unsigned short xradius, unsigned short yradius, short startAngle, short stopAngle, unsigned long color);
 
-// РњР°Р»СЋС” РєРѕРЅС‚СѓСЂ СЃРµРєС‚РѕСЂСѓ РµР»С–РїСЃСѓ РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё С†РµРЅС‚СЂСѓ - (x,y) РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - xradius, РІРµСЂС‚РёРєР°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - yradius
-// РїРѕС‡Р°С‚РєРѕРІРёР№ РєСѓС‚ РґСѓРіРё - startAngle, РєС–РЅС†РµРІРёР№ РєСѓС‚ - stopAngle
-// (РєСѓС‚Рё РІ РіСЂР°РґСѓСЃР°С…, СЂР°С…СѓСЋС‚СЊСЃСЏ РїСЂРѕС‚Рё РіРѕРґРёРЅРЅРёРєРѕРІРѕС— СЃС‚СЂС–Р»РєРё, 0 РіСЂР°РґСѓСЃС–РІ - С†Рµ СЂС–РІРЅРѕ РїСЂР°РІРѕСЂСѓС‡)
+// Малює контур сектору еліпсу кольором color
+// Координати центру - (x,y) горизонтальний радіус - xradius, вертикальний радіус - yradius
+// початковий кут дуги - startAngle, кінцевий кут - stopAngle
+// (кути в градусах, рахуються проти годинникової стрілки, 0 градусів - це рівно праворуч)
 void DrawEllipseSector(short x, short y, unsigned short xradius, unsigned short yradius, short startAngle, short stopAngle, unsigned long color);
 
-// РњР°Р»СЋС” РєРѕРЅС‚СѓСЂ СЃРµРіРјРµРЅС‚Сѓ РµР»С–РїСЃСѓ РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё С†РµРЅС‚СЂСѓ - (x,y) РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - xradius, РІРµСЂС‚РёРєР°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - yradius
-// РїРѕС‡Р°С‚РєРѕРІРёР№ РєСѓС‚ РґСѓРіРё - startAngle, РєС–РЅС†РµРІРёР№ РєСѓС‚ - stopAngle
-// (РєСѓС‚Рё РІ РіСЂР°РґСѓСЃР°С…, СЂР°С…СѓСЋС‚СЊСЃСЏ РїСЂРѕС‚Рё РіРѕРґРёРЅРЅРёРєРѕРІРѕС— СЃС‚СЂС–Р»РєРё, 0 РіСЂР°РґСѓСЃС–РІ - С†Рµ СЂС–РІРЅРѕ РїСЂР°РІРѕСЂСѓС‡)
+// Малює контур сегменту еліпсу кольором color
+// Координати центру - (x,y) горизонтальний радіус - xradius, вертикальний радіус - yradius
+// початковий кут дуги - startAngle, кінцевий кут - stopAngle
+// (кути в градусах, рахуються проти годинникової стрілки, 0 градусів - це рівно праворуч)
 void DrawEllipseChord(short x, short y, unsigned short xradius, unsigned short yradius, short startAngle, short stopAngle, unsigned long color);
 
-// РњР°Р»СЋС” РєРѕРЅС‚СѓСЂ РїСЂСЏРјРѕРєСѓС‚РЅРёРєР° РєРѕР»СЊРѕСЂРѕРј color
-// Р’РµСЂС…РЅС–Р№ Р»С–РІРёР№ РєСѓС‚ - (x1,y1), РЅРёР¶РЅС–Р№ РїСЂР°РІРёР№ РєСѓС‚ - (x2,y2)
+// Малює контур прямокутника кольором color
+// Верхній лівий кут - (x1,y1), нижній правий кут - (x2,y2)
 void DrawRectangle(short x1, short y1, short x2, short y2, unsigned long color);
 
-// РњР°Р»СЋС” Р±Р°РіР°С‚РѕРєСѓС‚РЅРёРє Р·Р°Р»РёС‚РёР№ РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё РІРµСЂС€РёРЅ Р»РµР¶Р°С‚СЊ РІ РјР°СЃСЃРёРІС– points, РєС–Р»СЊРєС–СЃС‚СЊ - count
+// Малює багатокутник залитий кольором color
+// Координати вершин лежать в массиві points, кількість - count
 void FillPoly(Point * points, unsigned short count, unsigned long color);
 
-// РњР°Р»СЋС” СЃРµРєС‚РѕСЂ РµР»С–РїСЃСѓ Р·Р°Р»РёС‚РёР№ РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё С†РµРЅС‚СЂСѓ - (x,y) РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - xradius, РІРµСЂС‚РёРєР°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - yradius
-// РїРѕС‡Р°С‚РєРѕРІРёР№ РєСѓС‚ РґСѓРіРё - startAngle, РєС–РЅС†РµРІРёР№ РєСѓС‚ - stopAngle
-// (РєСѓС‚Рё РІ РіСЂР°РґСѓСЃР°С…, СЂР°С…СѓСЋС‚СЊСЃСЏ РїСЂРѕС‚Рё РіРѕРґРёРЅРЅРёРєРѕРІРѕС— СЃС‚СЂС–Р»РєРё, 0 РіСЂР°РґСѓСЃС–РІ - С†Рµ СЂС–РІРЅРѕ РїСЂР°РІРѕСЂСѓС‡)
+// Малює сектор еліпсу залитий кольором color
+// Координати центру - (x,y) горизонтальний радіус - xradius, вертикальний радіус - yradius
+// початковий кут дуги - startAngle, кінцевий кут - stopAngle
+// (кути в градусах, рахуються проти годинникової стрілки, 0 градусів - це рівно праворуч)
 void FillEllipseSector(short x, short y, unsigned short xradius, unsigned short yradius, short startAngle, short stopAngle, unsigned long color);
 
-// РњР°Р»СЋС” СЃРµРіРјРµРЅС‚ РµР»С–РїСЃСѓ Р·Р°Р»РёС‚РёР№ РєРѕР»СЊРѕСЂРѕРј color
-// РљРѕРѕСЂРґРёРЅР°С‚Рё С†РµРЅС‚СЂСѓ - (x,y) РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - xradius, РІРµСЂС‚РёРєР°Р»СЊРЅРёР№ СЂР°РґС–СѓСЃ - yradius
-// РїРѕС‡Р°С‚РєРѕРІРёР№ РєСѓС‚ РґСѓРіРё - startAngle, РєС–РЅС†РµРІРёР№ РєСѓС‚ - stopAngle
-// (РєСѓС‚Рё РІ РіСЂР°РґСѓСЃР°С…, СЂР°С…СѓСЋС‚СЊСЃСЏ РїСЂРѕС‚Рё РіРѕРґРёРЅРЅРёРєРѕРІРѕС— СЃС‚СЂС–Р»РєРё, 0 РіСЂР°РґСѓСЃС–РІ - С†Рµ СЂС–РІРЅРѕ РїСЂР°РІРѕСЂСѓС‡)
+// Малює сегмент еліпсу залитий кольором color
+// Координати центру - (x,y) горизонтальний радіус - xradius, вертикальний радіус - yradius
+// початковий кут дуги - startAngle, кінцевий кут - stopAngle
+// (кути в градусах, рахуються проти годинникової стрілки, 0 градусів - це рівно праворуч)
 void FillEllipseChord(short x, short y, unsigned short xradius, unsigned short yradius, short startAngle, short stopAngle, unsigned long color);
 
-// РњР°Р»СЋС” РїСЂСЏРјРѕРєСѓС‚РЅРёРє Р·Р°Р»РёС‚РёР№ РєРѕР»СЊРѕСЂРѕРј color
-// Р’РµСЂС…РЅС–Р№ Р»С–РІРёР№ РєСѓС‚ - (x1,y1), РЅРёР¶РЅС–Р№ РїСЂР°РІРёР№ РєСѓС‚ - (x2,y2)
+// Малює прямокутник залитий кольором color
+// Верхній лівий кут - (x1,y1), нижній правий кут - (x2,y2)
 void FillRectangle(short x1, short y1, short x2, short y2, unsigned long color);
 
+// ------------------
+// Image Завантаження картинок
+// ------------------
+
 bool LoadBMPImage(Image& image, const char* filename);
+
+bool LoadPNGImage(Image& image, const char* filename);
 
 bool LoadBMPImageTransparent(Image& image, const char* filename);
 
@@ -140,6 +147,7 @@ public:
 	void DrawTilted(double x, double y, double width, double height, double angle) const;
 
 	bool LoadBMP(const char * filename, bool transparent = false);
+	bool LoadPNG(const char* filename);
 
 private:
 
@@ -151,11 +159,16 @@ private:
 	bool m_Initialized;
 };
 
+//
+// Color constants
+// Константи кольору
+//
+
 namespace Color
 {
 //
 // Color constants
-// РљРѕРЅСЃС‚Р°РЅС‚Рё РєРѕР»СЊРѕСЂСѓ
+// Константи кольору
 //
 const unsigned long AliceBlue = 0xFFF8F0;
 const unsigned long AlizarinCrimson = 0x3626E3;
@@ -415,7 +428,7 @@ const unsigned long YellowGreen = 0x32CD9A;
 const unsigned long Zinnwaldite = 0xAFC2EB;
 } //namespace Color
 
-// Р’РёРІРµРґРµРЅРЅСЏ С‚РµРєСЃС‚Сѓ
+// Виведення тексту
 void OutText(
 	short startx, short starty,
 	const char * text,
@@ -569,7 +582,7 @@ const unsigned long GLFW_KEY_LAST = GLFW_KEY_MENU;
 
 //
 // Windows virtual keys
-// РљРѕРґС‹ РІРёСЂС‚СѓР°Р»СЊРЅС‹С… РєР»Р°РІРёС€ РґР»СЏ РїСЂРѕС†РµРґСѓСЂС‹ IsKeyPressed()
+// Коды виртуальных клавиш для процедуры IsKeyPressed()
 //
 const unsigned long VK_SPACE = GLFW_KEY_SPACE;
 const unsigned long VK_APOSTROPHE = GLFW_KEY_APOSTROPHE;
@@ -691,6 +704,71 @@ const unsigned long VK_RIGHT_CONTROL = GLFW_KEY_RIGHT_CONTROL;
 const unsigned long VK_RIGHT_ALT = GLFW_KEY_RIGHT_ALT;
 const unsigned long VK_RIGHT_SUPER = GLFW_KEY_RIGHT_SUPER;
 const unsigned long VK_MENU = GLFW_KEY_MENU;
+
+// ------------------
+// Mouse
+// ------------------
+
+namespace Mouse
+{
+
+	enum Button
+	{
+		Left,
+		Middle,
+		Right,
+		Add1,
+		Add2,
+		Add3,
+		Add4,
+		Add5,
+		Unknown
+	};
+
+	enum Action
+	{
+		Released,
+		Pressed,		
+	};
+
+	enum CursorMode
+	{
+		Normal,
+		Hidden,
+		Disabled,
+		Captured
+	};
+
+	typedef void (*CursorPosFunc)(int xpos, int ypos);
+	typedef void (*CursorEnterFunc)(bool entered);
+	typedef void (*ButtonFunc)(Button button, Action act);
+	typedef void (*ScrollFunc)(int xoffset, int yoffset);
+
+	class IInputCallback
+	{
+	public:
+		virtual void OnMove(int xpos, int ypos) = 0;
+		virtual void OnEnter() = 0;
+		virtual void OnLeave() = 0;
+
+		virtual void OnButtonDown(Button but) = 0;
+		virtual void OnButtonUp(Button but) = 0;
+
+		virtual void OnScrollDown() = 0;
+		virtual void OnScrollUp() = 0;
+	};
+
+	void SetCursorPosCallback(CursorPosFunc cb);
+	void SetCursorEnterCallback(CursorEnterFunc cb);
+	void SetButtonCallback(ButtonFunc cb);
+	void SetScrollButtonCallback(ScrollFunc cb);
+
+	void AddInputHandler(IInputCallback* pIcb);
+	void RemoveInputHandler(IInputCallback* pIcb);
+
+	// Cursor
+	void SetCursorMode(CursorMode mode);
+}
 
 
 } // namespace Graph

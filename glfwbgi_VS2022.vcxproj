@@ -216,9 +216,11 @@ copy glfwbgi.h "$(SolutionDir)\build\include"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glfwbgi.cpp" />
+    <ClCompile Include="lodepng.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glfwbgi.h" />
+    <ClInclude Include="lodepng.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
