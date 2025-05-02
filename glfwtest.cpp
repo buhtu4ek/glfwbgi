@@ -147,14 +147,37 @@ int main()
 	// Тільки після цієї команди все намальоване з'явиться на екрані
 	SwapBuffers();
 
+	// Реєстрація колбеків для миші
 	Mouse::SetButtonCallback(MouseButtonHandler);
 	Mouse::SetScrollButtonCallback(ScrollHandler);
 	Mouse::SetCursorPosCallback(CursorPosHandler);
 	Mouse::SetCursorEnterCallback(CursorEnterHandler);
 
+	// Нормальний режим курсору
+	Mouse::SetCursorMode(Mouse::CursorMode::Normal);
+
 	// Цикл очікування натискання клавіші "Q"
 	while (! Graph::IsKeyPressed( Graph::VK_Q))
 	{
+		// Перевірка натисненої клавіші
+		if (Mouse::IsButtonPressed(Mouse::Button::Left))
+		{
+			printf("(poll) Left button pressed\n");
+		}
+
+		// Отримання поточних координат курсору
+		auto pos = Mouse::GetCursorPos();
+
+		// Зміна курсору в залежності від положення
+		if (pos.x < 200 && pos.y < 200)
+		{
+			Mouse::SetCursor(Mouse::CursorType::Crosshair);
+		}
+		else
+		{
+			Mouse::SetCursor(Mouse::CursorType::Arrow);
+		}
+
 		// Затримка 10 мс (обов'язково використовувати саме її, а не системні функції)
 		Graph::Delay(10);
 

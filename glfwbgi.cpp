@@ -60,6 +60,9 @@ static Mouse::ScrollFunc      g_MouseScrollHandler = nullptr;
 
 static std::set<Mouse::IInputCallback* > g_MouseHandlers;
 
+// Cursors
+static std::vector<GLFWcursor*> cursors;
+
 // Key buffer
 const unsigned long KeyBufSize = 32;
 unsigned int keyBuf[KeyBufSize];
@@ -212,6 +215,34 @@ unsigned long GetColor(unsigned char r, unsigned char g, unsigned char b)
 //
 // API
 //
+
+// Mouse cursor
+void InitCursors()
+{
+	cursors.resize((unsigned int)Mouse::CursorType::Last, nullptr);
+
+	cursors[(unsigned int)Mouse::CursorType::Arrow] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+	cursors[(unsigned int)Mouse::CursorType::IBeam] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+	cursors[(unsigned int)Mouse::CursorType::Crosshair] = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+	cursors[(unsigned int)Mouse::CursorType::Hand] = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
+	cursors[(unsigned int)Mouse::CursorType::ResizeHorz] = glfwCreateStandardCursor(GLFW_RESIZE_EW_CURSOR);
+	cursors[(unsigned int)Mouse::CursorType::ResizeVert] = glfwCreateStandardCursor(GLFW_RESIZE_NS_CURSOR);
+#ifndef  __APPLE__
+	cursors[(unsigned int)Mouse::CursorType::ResizeDiag1] = glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR);
+	cursors[(unsigned int)Mouse::CursorType::ResizeDiag2] = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
+#endif // ! __APPLE__
+	cursors[(unsigned int)Mouse::CursorType::ResizeAll] = glfwCreateStandardCursor(GLFW_RESIZE_ALL_CURSOR);
+	cursors[(unsigned int)Mouse::CursorType::NotAllowed] = glfwCreateStandardCursor(GLFW_NOT_ALLOWED_CURSOR);
+}
+
+void FreeCursors()
+{
+	for (auto pcurs : cursors)
+	{
+		glfwDestroyCursor(pcurs);
+	}
+}
+
 bool InitGraph(int width, int height, const char * title)
 {
 	glfwSetErrorCallback(&MyErrorCallback);
@@ -271,6 +302,9 @@ bool InitGraph(int width, int height, const char * title)
 	glfwSetWindowSizeCallback(graphWindow, &MyResizeCallback);
 	DBG_PRINT("all callbacks set\n");
 
+	InitCursors();
+	DBG_PRINT("cursors created\n");
+
 	glMatrixMode(GL_PROJECTION);
 
 	glLoadIdentity();
@@ -302,6 +336,8 @@ bool InitGraph(int width, int height, const char * title)
 
 void CloseGraph()
 {
+	FreeCursors();
+
 	glfwTerminate();
 
 	g_GraphWindow = nullptr;
@@ -1407,7 +1443,7 @@ bool LoadBMPImageTransparent(Image& image, const char* filename)
 	return image.LoadBMP(filename, true);
 }
 
-void SetCursorMode(Mouse::CursorMode mode)
+void Mouse::SetCursorMode(Mouse::CursorMode mode)
 {
 	unsigned int glfw_mode = GLFW_CURSOR_NORMAL;
 
@@ -1431,6 +1467,33 @@ void SetCursorMode(Mouse::CursorMode mode)
 	glfwSetInputMode(g_GraphWindow, GLFW_CURSOR, glfw_mode);
 }
 
+void Mouse::SetCursor(CursorType type)
+{
+	unsigned int index = (unsigned int)type;
+	if (index >= (unsigned int)CursorType::Last)
+	{
+		glfwSetCursor(g_GraphWindow, cursors[0]);
+	}
+	else
+	{
+		glfwSetCursor(g_GraphWindow, cursors[index]);
+	}
+}
+
+// Mouse polling functions
+Point Mouse::GetCursorPos()
+{
+	double x, y;
+	glfwGetCursorPos(g_GraphWindow, &x, &y);
+	return Point{ (int)x, (int)y };
+}
+
+bool Mouse::IsButtonPressed(Button button)
+{
+	return glfwGetMouseButton(g_GraphWindow, (int)button) == GLFW_PRESS;
+}
+
+// Mouse callbacks
 void Mouse::SetCursorPosCallback(CursorPosFunc cb)
 {
 	g_MousePosHandler = cb;
@@ -1451,6 +1514,7 @@ void Mouse::SetScrollButtonCallback(ScrollFunc cb)
 	g_MouseScrollHandler = cb;
 }
 
+// Callback interface handling
 void Mouse::AddInputHandler(IInputCallback* pIcb)
 {
 	g_MouseHandlers.insert(pIcb);
@@ -1460,6 +1524,7 @@ void Mouse::RemoveInputHandler(IInputCallback* pIcb)
 {
 	g_MouseHandlers.erase(pIcb);
 }
+
 
 } // namespace Graph
 

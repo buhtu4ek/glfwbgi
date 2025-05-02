@@ -739,11 +739,41 @@ namespace Mouse
 		Captured
 	};
 
+	enum CursorType
+	{
+		Arrow = 0,
+		IBeam,
+		Crosshair,
+		Hand,
+		ResizeVert,
+		ResizeHorz,
+#ifndef __APPLE__
+		ResizeDiag1,
+		ResizeDiag2,
+#endif // ! __APPLE__
+		ResizeAll,
+		NotAllowed,
+		Last
+	};
+
+	void SetCursor(CursorType type);
+
+	// Polling functions
+	Point GetCursorPos();
+	bool IsButtonPressed(Button button);
+
+	//  Callback functions
 	typedef void (*CursorPosFunc)(int xpos, int ypos);
 	typedef void (*CursorEnterFunc)(bool entered);
 	typedef void (*ButtonFunc)(Button button, Action act);
 	typedef void (*ScrollFunc)(int xoffset, int yoffset);
 
+	void SetCursorPosCallback(CursorPosFunc cb);
+	void SetCursorEnterCallback(CursorEnterFunc cb);
+	void SetButtonCallback(ButtonFunc cb);
+	void SetScrollButtonCallback(ScrollFunc cb);
+
+	// Callback interface
 	class IInputCallback
 	{
 	public:
@@ -758,17 +788,13 @@ namespace Mouse
 		virtual void OnScrollUp() = 0;
 	};
 
-	void SetCursorPosCallback(CursorPosFunc cb);
-	void SetCursorEnterCallback(CursorEnterFunc cb);
-	void SetButtonCallback(ButtonFunc cb);
-	void SetScrollButtonCallback(ScrollFunc cb);
-
 	void AddInputHandler(IInputCallback* pIcb);
 	void RemoveInputHandler(IInputCallback* pIcb);
 
 	// Cursor
 	void SetCursorMode(CursorMode mode);
-}
+
+} // namespace Mouse
 
 
 } // namespace Graph
