@@ -30,20 +30,6 @@
 namespace Graph
 {
 
-typedef union 
-{
-	unsigned long dwColor;
-
-	struct  
-	{
-		unsigned long r : 8;
-		unsigned long g : 8;
-		unsigned long b : 8;
-		unsigned long : 8;
-	} rgb;
-
-} ColorType;
-
 //
 // Variables
 //
@@ -205,6 +191,11 @@ void MyMouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 		}
 	}
 
+}
+
+void* NativeHandle()
+{
+	return g_GraphWindow;
 }
 
 unsigned long GetColor(unsigned char r, unsigned char g, unsigned char b)
@@ -440,7 +431,7 @@ void Rectangled(double x1, double y1, double x2, double y2, unsigned long color,
 		return;
 	}
 
-	ColorType &tmpColor = *((ColorType*)&color);
+	Color::Type &tmpColor = *((Color::Type*)&color);
 
 	glBegin(bPolygon ? GL_POLYGON : GL_LINE_LOOP);
 
@@ -477,7 +468,7 @@ void Ellipsed(double x, double y, double xradius, double yradius, double startAn
 		fistep = 1 / yradius;
 	}
 
-	ColorType &tmpColor = *((ColorType*)&color);
+	Color::Type &tmpColor = *((Color::Type*)&color);
 
 	glBegin(bPolygon ?
 		GL_POLYGON :
@@ -530,7 +521,7 @@ void Poly(Point * points, unsigned short count, unsigned long color, PolyType ty
 		return;
 	}
 
-	ColorType &tmpColor = *((ColorType*)&color);
+	Color::Type &tmpColor = *((Color::Type*)&color);
 
 	glColor3ub(tmpColor.rgb.r, tmpColor.rgb.g, tmpColor.rgb.b);
 
@@ -550,7 +541,7 @@ void Lined(double x1, double y1, double x2, double y2, unsigned long color)
 
 	glBegin(GL_LINE_LOOP);
 	
-	ColorType &tmpColor = *((ColorType*)&color);
+	Color::Type &tmpColor = *((Color::Type*)&color);
 
 	glColor3ub(tmpColor.rgb.r, tmpColor.rgb.g, tmpColor.rgb.b);
 
@@ -566,7 +557,7 @@ void DrawLine(short x1, short y1, short x2, short y2, unsigned long color)
 // 
 // 	glBegin(GL_LINES);
 // 
-// 	ColorType &tmpColor = *((ColorType*)&color);
+// 	Color::Type &tmpColor = *((Color::Type*)&color);
 // 
 // 	//glColor3ub(tmpColor.rgb.r, tmpColor.rgb.g, tmpColor.rgb.b);
 // 	glColor3ub(0, 0, 0);
@@ -641,7 +632,7 @@ void ClearDevice(unsigned long color)
 {
 	if( !g_GraphEnabled ) return;
 
-	ColorType tmpColor;
+	Color::Type tmpColor;
 	tmpColor.dwColor = color;
 
 	glClearColor(

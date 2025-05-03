@@ -172,6 +172,20 @@ private:
 
 namespace Color
 {
+
+	typedef union
+	{
+		unsigned long dwColor;
+
+		struct
+		{
+			unsigned long r : 8;
+			unsigned long g : 8;
+			unsigned long b : 8;
+			unsigned long : 8;
+		} rgb;
+
+	} Type;
 //
 // Color constants
 // Константи кольору
