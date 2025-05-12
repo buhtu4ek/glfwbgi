@@ -1173,12 +1173,42 @@ bool ValidateInfoHeader(const BMPINFOHEADER &bmiHeader, const char * filename)
 	return true;
 }
 
-Image::Image()
+Image::Image() noexcept
 	: m_Texture(0)
 	, m_Initialized(false)
 	, m_Width(0)
 	, m_Height(0)
 {	
+}
+
+Image::Image(Image&& other) noexcept
+	: m_Texture(other.m_Texture)
+	, m_Width(other.m_Width)
+	, m_Height(other.m_Height)
+	, m_Initialized(other.m_Initialized)
+{
+	other.m_Initialized = false;
+	other.m_Texture = 0;
+	other.m_Width = 0;
+	other.m_Height = 0;
+}
+
+Image& Image::operator=(Image&& other) noexcept
+{
+	if (&other != this)
+	{
+		this->m_Texture = other.m_Texture;
+		this->m_Initialized = other.m_Initialized;
+		this->m_Width = other.m_Width;
+		this->m_Height = other.m_Height;
+
+		other.m_Initialized = false;
+		other.m_Texture = 0;
+		other.m_Width = 0;
+		other.m_Height = 0;
+	}
+
+	return *this;
 }
 
 Image::~Image()

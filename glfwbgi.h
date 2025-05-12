@@ -139,9 +139,15 @@ void DrawImageTilted(const Image& image, short x, short y, short width, short he
 class Image
 {
 public:
-	Image();
-	~Image();
+	Image() noexcept;
+	~Image() noexcept;
 
+	Image(const Image&) = delete;
+	Image& operator=(const Image&) = delete;
+
+	Image(Image &&) noexcept;
+	Image& operator=(Image &&) noexcept;
+	
 	void Draw(double x, double y) const;
 
 	void DrawTilted(double x, double y, double width, double height, double angle) const;
