@@ -133,7 +133,7 @@ copy glfwbgi.h "$(SolutionDir)\build\include"</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>glfw3.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;freetype.lib</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>lib\vc2022\x64</AdditionalLibraryDirectories>
@@ -215,10 +215,12 @@ copy glfwbgi.h "$(SolutionDir)\build\include"</Command>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="freetype.cpp" />
     <ClCompile Include="glfwbgi.cpp" />
     <ClCompile Include="lodepng.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="freetype.h" />
     <ClInclude Include="glfwbgi.h" />
     <ClInclude Include="lodepng.h" />
   </ItemGroup>

@@ -24,12 +24,18 @@
     <ClCompile Include="lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="freetype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glfwbgi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lodepng.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="freetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

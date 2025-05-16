@@ -1,4 +1,6 @@
 #pragma once
+#ifndef GLFWBGI_H_INCLUDED
+#define GLFWBGI_H_INCLUDED
 
 #include <string>
 
@@ -453,22 +455,29 @@ void OutText(
 	short startx, short starty,
 	const char * text,
 	unsigned long color = Color::White,
-	unsigned short size = 4
+	unsigned short size = 12
 	);
 
 void OutText(
 	short startx, short starty,
 	const std::string &text,
 	unsigned long color = Color::White,
-	unsigned short size = 4
+	unsigned short size = 12
 	);
 
 void OutText(
 	short startx, short starty,
 	char text,
 	unsigned long color = Color::White,
-	unsigned short size = 4
+	unsigned short size = 12
 	);
+
+void OutText(
+	short startx, short starty,
+	const std::wstring& text,
+	unsigned long color = Color::White,
+	unsigned short size = 12
+);
 
 //
 // Key constants
@@ -602,7 +611,7 @@ const unsigned long GLFW_KEY_LAST = GLFW_KEY_MENU;
 
 //
 // Windows virtual keys
-// Коды виртуальных клавиш для процедуры IsKeyPressed()
+// Коди віртуальных клавіш для процедури IsKeyPressed()
 //
 const unsigned long VK_SPACE = GLFW_KEY_SPACE;
 const unsigned long VK_APOSTROPHE = GLFW_KEY_APOSTROPHE;
@@ -808,6 +817,19 @@ namespace Mouse
 		virtual void OnScrollUp() = 0;
 	};
 
+	class InputCallback : public IInputCallback
+	{
+		void OnMove(int xpos, int ypos) override {}
+		virtual void OnEnter() override {}
+		virtual void OnLeave() override {}
+
+		virtual void OnButtonDown(Button but) override {}
+		virtual void OnButtonUp(Button but) override {}
+
+		virtual void OnScrollDown() override {}
+		virtual void OnScrollUp() override {}
+	};
+
 	void AddInputHandler(IInputCallback* pIcb);
 	void RemoveInputHandler(IInputCallback* pIcb);
 
@@ -816,5 +838,6 @@ namespace Mouse
 
 } // namespace Mouse
 
-
 } // namespace Graph
+
+#endif // !GLFWBGI_H_INCLUDED

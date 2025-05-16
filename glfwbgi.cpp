@@ -2,6 +2,8 @@
 
 #include "glfwbgi.h"
 
+#include "freetype.h"
+
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 //#error apple defined
@@ -48,6 +50,9 @@ static std::set<Mouse::IInputCallback* > g_MouseHandlers;
 
 // Cursors
 static std::vector<GLFWcursor*> cursors;
+
+// Fonts
+static std::vector<Font> fonts;
 
 // Key buffer
 const unsigned long KeyBufSize = 32;
@@ -207,6 +212,11 @@ unsigned long GetColor(unsigned char r, unsigned char g, unsigned char b)
 // API
 //
 
+void InitFonts()
+{
+	fonts.emplace_back("c:\\windows\\fonts\\arial.ttf");
+}
+
 // Mouse cursor
 void InitCursors()
 {
@@ -238,14 +248,25 @@ bool InitGraph(int width, int height, const char * title)
 {
 	glfwSetErrorCallback(&MyErrorCallback);
 
+	if (g_GraphEnabled)
+	{
+		printf("Warning: Second initialization\n");
+		return true;
+	}
+
 	int res = glfwInit();
 	if( res == GLFW_FALSE )
 	{
-		printf("LIB init failed\n");
+		printf("Graphic LIB init failed\n");
 		return false;
 	}
 
 	DBG_PRINT("GLFW initialized\n");
+
+	if (!Font::Init())
+	{
+		printf("Font LIB init failed\n");
+	}
 
 	//* Create a windowed mode window and its OpenGL context */
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -295,6 +316,9 @@ bool InitGraph(int width, int height, const char * title)
 
 	InitCursors();
 	DBG_PRINT("cursors created\n");
+
+	InitFonts();
+	DBG_PRINT("fonts created\n");
 
 	glMatrixMode(GL_PROJECTION);
 
@@ -554,18 +578,6 @@ void Lined(double x1, double y1, double x2, double y2, unsigned long color)
 void DrawLine(short x1, short y1, short x2, short y2, unsigned long color)
 {
 	Lined(x1, y1, x2, y2, color);
-// 
-// 	glBegin(GL_LINES);
-// 
-// 	Color::Type &tmpColor = *((Color::Type*)&color);
-// 
-// 	//glColor3ub(tmpColor.rgb.r, tmpColor.rgb.g, tmpColor.rgb.b);
-// 	glColor3ub(0, 0, 0);
-// 
-// 	glVertex2i(500, 500);
-// 	glVertex2i(, y2);
-// 
-// 	glEnd();
 }
 
 void DrawEllipseArc(short x, short y, unsigned short xradius, unsigned short yradius, short startAngle, short stopAngle, unsigned long color)
@@ -1029,15 +1041,20 @@ void OutChar(double x, double y, char ch)
 
 void OutText(short startx, short starty, char text, unsigned long color, unsigned short size)
 {
-	FontWidth = size;
-	FontHeight = 2*size;
-	FontSpacing = size/2;
-	FontColor = color;
+	std::string tmp(1, text);
+	OutText(startx, starty, tmp.c_str(), color, size);
+}
 
-	double x = startx;
-	double y = starty;
-
-	OutChar(x,y, text);
+void OutText(short startx, short starty, const std::wstring& text, unsigned long color, unsigned short size)
+{
+	if (!fonts.empty())
+	{
+		// Freetype font
+		fonts.front().DrawText(size, startx, starty, text, color);
+		return;
+	}
+	
+	printf("No fonts loaded\n");
 }
 
 void OutText(short startx, short starty, const std::string &text, unsigned long color, unsigned short size)
@@ -1049,17 +1066,27 @@ void OutText(short startx, short starty, const char * text, unsigned long color,
 {
 	DBG_PRINT("OutText %d %d %s %08X %d\n", startx, starty, text, color, size);
 
-	FontWidth = size;
-	FontHeight = 2*size;
-	FontSpacing = size/2;
+	if (!fonts.empty())
+	{
+		// Freetype font
+		fonts.front().DrawText(size, startx, starty, text, color);
+		return;
+	}
+	
+	printf("No fonts loaded\n");
+
+	// Fall-back font
+	FontWidth = size / 2.0;
+	FontHeight = size;
+	FontSpacing = size / 4.0;
 	FontColor = color;
 
 	double x = startx;
 	double y = starty;
 
-	for (int i = 0; text[i]; ++i )
-	{		
-		OutChar(x,y,text[i]);
+	for (int i = 0; text[i]; ++i)
+	{
+		OutChar(x, y, text[i]);
 
 		x += FontWidth + FontSpacing;
 	}

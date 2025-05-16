@@ -5,8 +5,6 @@
 
 #include "glfwbgi.h"
 
-#include "include/GLFW/glfw3.h"
-
 using namespace Graph;
 
 void CursorPosHandler(int xpos, int ypos)
@@ -110,13 +108,9 @@ int main()
 	DrawLine(580, 450, 540, 460, Color::Green);
 
 	// Текст
-	OutText(10, 400, "the quick brown fox jumps over the lazy dog 1234567890", Color::White);
-	OutText(10, 500, "the quick brown fox jumps over the lazy dog 1234567890", Color::Red, 10);
-
-	std::string s = "std test";
-	OutText(10, 550, s, Color::Red, 5);
-
-	OutText(10, 600, 'S', Color::Blue, 12);
+	OutText(10, 400, "the quick brown fox jumps over the lazy dog! 1234567890", Color::White);
+	OutText(10, 450, 'Q', Color::Pink, 28);
+	OutText(10, 500, "the quick brown fox jumps over the lazy dog! 1234567890", Color::Red, 28);
 
 	// Спрайт
 	Graph::Image image1;
@@ -141,6 +135,9 @@ int main()
 		DrawImageTilted(image3, 750, 120, 40, 60, -30);
 
 		DrawImageTilted(image3, 750, 220, 40, 60, -70);
+
+		image3.Draw(750, 320);
+		
 	}
 
 	// "зміна буферів"
