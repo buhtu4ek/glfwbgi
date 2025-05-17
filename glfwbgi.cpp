@@ -214,7 +214,11 @@ unsigned long GetColor(unsigned char r, unsigned char g, unsigned char b)
 
 void InitFonts()
 {
+#ifdef __APPLE__
+	fonts.emplace_back("/Library/Fonts/Arial Unicode.ttf");
+#else
 	fonts.emplace_back("c:\\windows\\fonts\\arial.ttf");
+#endif
 }
 
 // Mouse cursor
@@ -1229,7 +1233,7 @@ Image& Image::operator=(Image&& other) noexcept
 	return *this;
 }
 
-Image::~Image()
+Image::~Image() noexcept
 {
 	if (m_Initialized && m_Texture != 0)
 	{

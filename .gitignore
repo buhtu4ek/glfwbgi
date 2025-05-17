@@ -3,6 +3,9 @@
 .vscode/
 *.vcxproj.user
 
+#MacOS files
+.DS_Store
+
 # Prerequisites
 *.d
 

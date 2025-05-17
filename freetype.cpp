@@ -1,7 +1,11 @@
 #include "freetype.h"
 
-#include "glfw\glfw3.h"
+#ifdef __APPLE__
+#define GL_SILENCE_DEPRECATION
+#include <GLFW/glfw3.h>
+#else
 #include <gl\GL.h>
+#endif
 
 #include "ft2build.h"
 #include FT_FREETYPE_H
